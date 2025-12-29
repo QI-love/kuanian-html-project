@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 跨年倒计时 - 纪念相册版</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: #fff;
+            font-family: "Microsoft YaHei", sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 3; /* 放在最前面 */
+            text-align: center;
+            pointer-events: none;
+        }
+
+        /* 照片展示框样式 */
+        .photo-frame {
+            position: relative;
+            z-index: 2;
+            width: 300px; /* 照片宽度 */
+            height: 400px; /* 照片高度 */
+            margin-bottom: 20px;
+            border: 8px solid rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            background: #222;
+        }
+
+        .photo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 自动裁剪填充 */
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1.5s ease-in-out;
+        }
+
+        .photo-frame img.active {
+            opacity: 1;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin: 10px 0;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+        }
+
+        #countdown {
+            font-size: 2.5rem;
+            font-weight: bold;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .time-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            min-width: 80px;
+        }
+
+        .label {
+            font-size: 0.8rem;
+            display: block;
+            color: #ccc;
+        }
+
+        #message {
+            font-size: 4rem;
+            color: #ff4d4d;
+            display: none;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); text-shadow: 0 0 10px #ff0000; }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px #ff0000; }
+            100% { transform: scale(1); text-shadow: 0 0 10px #ff0000; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas"></canvas>
+
+    <!-- 照片展示区域 -->
+    <div class="photo-frame" id="photoFrame">
+        <!-- 图片会通过 JS 动态加载 -->
+    </div>
+
+    <div class="container">
+        <h1 id="title">距离 2026 年还有</h1>
+        <div id="countdown">
+            <div class="time-box"><span id="days">00</span><span class="label">天</span></div>
+            <div class="time-box"><span id="hours">00</span><span class="label">时</span></div>
+            <div class="time-box"><span id="minutes">00</span><span class="label">分</span></div>
+            <div class="time-box"><span id="seconds">00</span><span class="label">秒</span></div>
+        </div>
+        <div id="message">2026 新年快乐！</div>
+    </div>
+
+    <script>
+        // --- 1. 自定义照片设置 ---
+        // 在这里放入你的照片路径（可以是本地路径，也可以是网络链接）
+        const photoList = [
+            'images/(1).jpg', 
+            'images/(2).jpg',
+            'images/(3).jpg', 
+            'images/(4).jpg',
+            'images/(5).jpg', 
+            'images/(6).jpg',
+            'images/(7).jpg', 
+            'images/(8).jpg',
+            'images/(9).jpg', 
+            'images/(10).jpg',
+            'images/(11).jpg', 
+            'images/(12).jpg',
+            'images/(13).jpg', 
+            'images/(14).jpg',
+            'images/(15).jpg', 
+            'images/(16).jpg',
+            'images/(17).jpg', 
+            'images/(18).jpg',
+            'images/(19).jpg', 
+            'images/(20).jpg',
+            'images/(21).jpg'
+        ];
+
+        const photoFrame = document.getElementById('photoFrame');
+        
+        // 初始化照片
+        photoList.forEach((src, index) => {
+            const img = document.createElement('img');
+            img.src = src;
+            if (index === 0) img.classList.add('active');
+            photoFrame.appendChild(img);
+        });
+
+        // 照片轮播逻辑
+        let currentPhotoIndex = 0;
+        const images = photoFrame.getElementsByTagName('img');
+        
+        function nextPhoto() {
+            images[currentPhotoIndex].classList.remove('active');
+            currentPhotoIndex = (currentPhotoIndex + 1) % images.length;
+            images[currentPhotoIndex].classList.add('active');
+        }
+
+        if (images.length > 1) {
+            setInterval(nextPhoto, 4000); // 每 4 秒切换一张
+        }
+
+        // --- 2. 倒计时逻辑 ---
+        const targetDate = new Date('January 1, 2026 00:00:00').getTime();
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').style.display = 'none';
+                document.getElementById('title').style.display = 'none';
+                document.getElementById('message').style.display = 'block';
+                return;
+            }
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = d.toString().padStart(2, '0');
+            document.getElementById('hours').innerText = h.toString().padStart(2, '0');
+            document.getElementById('minutes').innerText = m.toString().padStart(2, '0');
+            document.getElementById('seconds').innerText = s.toString().padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // --- 3. 烟花特效逻辑 (保持不变) ---
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        class Firework {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height;
+                this.sx = Math.random() * 3 - 1.5;
+                this.sy = Math.random() * -3 - 4;
+                this.size = 2;
+                this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                this.exploded = false;
+                this.particles = [];
+            }
+            update() {
+                if (!this.exploded) {
+                    this.x += this.sx;
+                    this.y += this.sy;
+                    this.sy += 0.05;
+                    if (this.sy >= -1) {
+                        this.exploded = true;
+                        this.explode();
+                    }
+                }
+                this.particles.forEach((p, i) => {
+                    p.update();
+                    if (p.alpha <= 0) this.particles.splice(i, 1);
+                });
+            }
+            explode() {
+                for (let i = 0; i < 80; i++) {
+                    this.particles.push(new Particle(this.x, this.y, this.color));
+                }
+            }
+            draw() {
+                if (!this.exploded) {
+                    ctx.fillStyle = this.color;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                this.particles.forEach(p => p.draw());
+            }
+        }
+
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = Math.random() * 4 + 1;
+                this.friction = 0.96;
+                this.gravity = 0.12;
+                this.alpha = 1;
+                this.decay = Math.random() * 0.015 + 0.01;
+            }
+            update() {
+                this.speed *= this.friction;
+                this.x += Math.cos(this.angle) * this.speed;
+                this.y += Math.sin(this.angle) * this.speed + this.gravity;
+                this.alpha -= this.decay;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 1.2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        const fireworks = [];
+        function animate() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            if (Math.random() < 0.04) fireworks.push(new Firework());
+            fireworks.forEach((fw, i) => {
+                fw.update();
+                fw.draw();
+                if (fw.exploded && fw.particles.length === 0) fireworks.splice(i, 1);
+            });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>
