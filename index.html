@@ -125,27 +125,28 @@
     <script>
         // --- 1. 自定义照片设置（优化加载逻辑） ---
         const photoList = [
-            './(1).jpg', 
-            './(2).jpg',
-            './(3).jpg', 
-            './(4).jpg',
-            './(5).jpg', 
-            './(6).jpg',
-            './(7).jpg', 
-            './(8).jpg',
-            './(9).jpg', 
-            './(10).jpg',
-            './(11).jpg', 
-            './(12).jpg',
-            './(13).jpg', 
-            './(14).jpg',
-            './(15).jpg', 
-            './(16).jpg',
-            './(17).jpg', 
-            './(18).jpg',
-            './(19).jpg', 
-            './(20).jpg',
-            './(21).jpg'
+           '(1).jpg', 
+            '(2).jpg',
+            '(3).jpg', 
+            '(4).jpg',
+            '(5).jpg', 
+            '(6).jpg',
+            '(7).jpg', 
+            '(8).jpg',
+            '(9).jpg', 
+            '(10).jpg',
+            '(11).jpg', 
+            '(12).jpg',
+            '(13).jpg', 
+            '(14).jpg',
+            '(15).jpg', 
+            '(16).jpg',
+            '(17).jpg', 
+            '(18).jpg',
+            '(19).jpg', 
+            '(20).jpg',
+            '(21).jpg'
+
         ];
 
         const photoFrame = document.getElementById('photoFrame');
@@ -190,11 +191,11 @@
         }
 
         // --- 2. 倒计时逻辑（保持不变） ---
-        //const targetDate = new Date('January 1, 2026 00:00:00').getTime();
+        const targetDate = new Date('January 1, 2026 00:00:00').getTime();
 // 替换原有目标时间代码，快速测试
-const testDate = new Date();
-testDate.setSeconds(testDate.getSeconds() + 10); // 当前时间+10秒
-const targetDate = testDate.getTime();
+// const testDate = new Date();
+// testDate.setSeconds(testDate.getSeconds() + 10); // 当前时间+10秒
+// const targetDate = testDate.getTime();
 		
         function updateCountdown() {
             const now = new Date().getTime();
