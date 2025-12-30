@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2026 跨年倒计时 - 纪念相册版</title>
+    <title>2026 跨年倒计时 爱你哟我的张琪小朋友</title>
     <style>
         body {
             margin: 0;
@@ -26,14 +26,12 @@
             z-index: 1;
         }
 
-        /* 修复.container类的CSS语法，补充完整布局属性 */
         .container {
             position: relative;
             z-index: 2;
             text-align: center;
         }
 
-        /* 照片展示框样式 */
         .photo-frame {
             position: relative;
             z-index: 2;
@@ -125,8 +123,7 @@
     </div>
 
     <script>
-        // --- 1. 自定义照片设置 ---
-        // 在这里放入你的照片路径（可以是本地路径，也可以是网络链接）
+        // --- 1. 自定义照片设置（优化加载逻辑） ---
         const photoList = [
             'images/(1).jpg', 
             'images/(2).jpg',
@@ -152,30 +149,47 @@
         ];
 
         const photoFrame = document.getElementById('photoFrame');
-        
-        // 初始化照片
+        let loadedCount = 0; // 记录已加载完成的图片数量
+        const totalPhotos = photoList.length;
+        let images = []; // 存储图片元素
+        let currentPhotoIndex = 0;
+
+        // 初始化照片，监听加载完成事件
         photoList.forEach((src, index) => {
             const img = document.createElement('img');
             img.src = src;
-            if (index === 0) img.classList.add('active');
+            // 图片加载完成回调
+            img.onload = function() {
+                loadedCount++;
+                // 所有图片加载完成后，再显示第一张并启动轮播
+                if (loadedCount === totalPhotos) {
+                    images = photoFrame.getElementsByTagName('img');
+                    images[0].classList.add('active');
+                    startPhotoCarousel(); // 启动轮播
+                }
+            };
+            // 图片加载失败回调（便于排查问题）
+            img.onerror = function() {
+                console.error(`图片加载失败：${src}，请检查路径和文件名`);
+            };
             photoFrame.appendChild(img);
         });
 
-        // 照片轮播逻辑
-        let currentPhotoIndex = 0;
-        const images = photoFrame.getElementsByTagName('img');
-        
+        // 照片轮播函数
         function nextPhoto() {
             images[currentPhotoIndex].classList.remove('active');
             currentPhotoIndex = (currentPhotoIndex + 1) % images.length;
             images[currentPhotoIndex].classList.add('active');
         }
 
-        if (images.length > 1) {
-            setInterval(nextPhoto, 4000); // 每 4 秒切换一张
+        // 启动轮播函数
+        function startPhotoCarousel() {
+            if (images.length > 1) {
+                setInterval(nextPhoto, 4000); // 每 4 秒切换一张
+            }
         }
 
-        // --- 2. 倒计时逻辑 ---
+        // --- 2. 倒计时逻辑（保持不变） ---
         const targetDate = new Date('January 1, 2026 00:00:00').getTime();
 
         function updateCountdown() {
