@@ -190,8 +190,12 @@
         }
 
         // --- 2. 倒计时逻辑（保持不变） ---
-        const targetDate = new Date('January 1, 2026 00:00:00').getTime();
-
+        //const targetDate = new Date('January 1, 2026 00:00:00').getTime();
+// 替换原有目标时间代码，快速测试
+const testDate = new Date();
+testDate.setSeconds(testDate.getSeconds() + 10); // 当前时间+10秒
+const targetDate = testDate.getTime();
+		
         function updateCountdown() {
             const now = new Date().getTime();
             const diff = targetDate - now;
