@@ -159,6 +159,8 @@
         photoList.forEach((src, index) => {
             const img = document.createElement('img');
             img.src = src;
+			img.loading = "lazy"; // 开启原生懒加载
+    // 针对轮播图：非首屏图片（index>1）懒加载，首屏图片优先加载
             if (index === 0) img.classList.add('active');
             photoFrame.appendChild(img);
         });
@@ -306,6 +308,7 @@
     </script>
 </body>
 </html>
+
 
 
 
